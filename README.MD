@@ -28,14 +28,19 @@ For the legacy CJP, the envelopes for Operations Center and Managed Controllers 
 
 ## Using the calc script to query the Update Centers
 
-The calc.sh script in this repo takes a plugins.yaml file as an input and outputs the following to a text file:
+The calc.sh script in this repo takes a plugins.yaml file as an input and outputs the following to a JSON file:
 
-1. The version of the plugin listed in the update center for a specified version of Cloudbees CI
+1. The version of the plugin listed in the update center for the specified version of Cloudbees CI
 2. The versions of all dependency plugins listed in the same update center
 
 Please Note: The plugin does not take into account that some plugins are bundled with the Cloudbees CI WAR file and will include these plugins in the list as well
 
-Usage: calc.sh -v <CI_VERSION> [-f <path/to/plugins.yaml>]
+    Usage: calc.sh -v <CI_VERSION> [-f <path/to/plugins.yaml>]
 
     -f FILE     path to the plugins.yaml file
     -v          The version of CloudBees CI (e.g. 2.263.4.2)
+
+For specifying the update center use the environment variable CB_UPDATE_CENTER (defaults to: https://jenkins-updates.cloudbees.com/update-center/envelope-core-mm)
+
+    example:
+    export CB_UPDATE_CENTER="https://jenkins-updates.cloudbees.com/update-center/envelope-cje"
