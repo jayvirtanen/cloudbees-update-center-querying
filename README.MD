@@ -1,4 +1,4 @@
-## My notes on how to query the CloudBees Update Centers
+## Notes on how to query the CloudBees Update Centers (From https://github.com/kyounger/cloudbees-update-center-querying)
 
 These snippets include some extensible code that helps query the UpdateCenter for plugins in various ways. It uses `jq` and [`dsq`](https://github.com/multiprocessio/dsq). Note the fairly plain sql statements used by `dsq` that could be more complicated, if desired.
 
@@ -25,3 +25,17 @@ Note that the ENVELOPE variable is product- _and_ component-specific.
 
 For CloudBees CI Modern, the envelopes for Operations Center and Managed Controllers are `envelope-core-oc` and `envelope-core-mm`, respectively.
 For the legacy CJP, the envelopes for Operations Center and Managed Controllers are `envelope-cjoc` and `envelope-cje`, respectively.
+
+## Using the calc script to query the Update Centers
+
+The calc.sh script in this repo takes a plugins.yaml file as an input and outputs the following to a text file:
+
+1. The version of the plugin listed in the update center for a specified version of Cloudbees CI
+2. The versions of all dependency plugins listed in the same update center
+
+Please Note: The plugin does not take into account that some plugins are bundled with the Cloudbees CI WAR file and will include these plugins in the list as well
+
+Usage: calc.sh -v <CI_VERSION> [-f <path/to/plugins.yaml>]
+
+    -f FILE     path to the plugins.yaml file
+    -v          The version of CloudBees CI (e.g. 2.263.4.2)
