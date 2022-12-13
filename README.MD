@@ -42,5 +42,5 @@ Usage: calc.sh -v <CI_VERSION> [-f <path/to/plugins.yaml>]
 
 For specifying the update center use the environment variable CB_UPDATE_CENTER (defaults to: https://jenkins-updates.cloudbees.com/update-center/envelope-core-mm)
 
-example:
-export CB_UPDATE_CENTER="https://jenkins-updates.cloudbees.com/update-center/envelope-cje"
+    example:
+    export CB_UPDATE_CENTER="https://jenkins-updates.cloudbees.com/update-center/envelope-cje"
