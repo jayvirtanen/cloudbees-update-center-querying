@@ -35,7 +35,7 @@ The calc.sh script in this repo takes a plugins.yaml file as an input and output
 
 Please Note: The plugin does not take into account that some plugins are bundled with the Cloudbees CI WAR file and will include these plugins in the list as well
 
-Usage: calc.sh -v <CI_VERSION> [-f <path/to/plugins.yaml>]
+    Usage: calc.sh -v <CI_VERSION> [-f <path/to/plugins.yaml>]
 
     -f FILE     path to the plugins.yaml file
     -v          The version of CloudBees CI (e.g. 2.263.4.2)
