@@ -46,8 +46,8 @@ do
   arrPLUGIN=(${PLUGIN//:/ })
   PLUGIN_ARRAY[i]=${arrPLUGIN[1]}
 done
-
-echo "Versions for listed plugins:" > plugins.txt
+echo "" > plugins.txt
+echo '{"Listed Plugins":[' > plugins.json
 echo "Checking Update Center for versions of listed plugins..."
 
 #Pulls the versions of the plugins listed in the plugins.yaml from the JSON provided by the UC
@@ -56,10 +56,14 @@ do
   PLUG=$(jq -r --arg NAME "$i" '[.plugins[] | {name: .name, version: .version } | select(.name==$NAME)  ]' uc.json \
   | dsq -s json 'select name, version from {}')
   PLUG_ARRAY+=($PLUG)
-  echo $PLUG >> plugins.txt
+  CLEAN=$(echo $PLUG |sed 's/[][]//g')
+  echo $CLEAN"," >> plugins.txt
 done
 
-echo "Dependency plugins:" >> plugins.txt
+sed -r '$s/(.*),/\1 /' plugins.txt > temp.txt
+cat temp.txt >> plugins.json
+
+echo '],"Dependency Plugins":[' >> plugins.json
 echo "Checking Update Center for versions of plugin dependencies..."
 
 #Pulls the dependencies of the requested plugins from the UC JSON and then fetches the versions of those plugins from the UC JSON
@@ -81,40 +85,40 @@ UNIQUE_DEPS=($(echo "${DEP_ARRAY[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
 ALL_PLUGINS=("${PLUG_ARRAY[@]}" "${UNIQUE_DEPS[@]}")
 UNIQUE_PLUGS=($(echo "${ALL_PLUGINS[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
 
-echo "Printing results to plugins.txt"
+echo "Printing results to plugins.json"
 
 #writes complete array list to file
 for i in "${UNIQUE_DEPS[@]}"
 do
-    echo $i >> plugins.txt
+    CLEAN=$(echo $i |sed 's/[][]//g')
+    echo $CLEAN"," >> plugins.txt
 done
+sed -r '$s/(.*),/\1 /' plugins.txt > temp.txt
+cat temp.txt >> plugins.json
 
-echo "Total Plugin List:" >> plugins.txt
-echo '{"plugins":[' > plugins.json
+echo '],"Total Plugins":[' >> plugins.json
 
 #Combines all JSON objects from array into single object
 for i in "${UNIQUE_PLUGS[@]}"
 do
-    echo $i >> plugins.txt
     CLEAN=$(echo $i |sed 's/[][]//g')
-    echo $CLEAN"," >> plugins.json
+    echo $CLEAN"," >> plugins.txt
 done
+sed -r '$s/(.*),/\1 /' plugins.txt > temp.txt
+cat temp.txt >> plugins.json
+echo "]}" >> plugins.json
 
 echo "Building new_plugins.yaml..."
+echo "plugins:" > new_plugins.yaml
 #trims hanging comma and adds close bracket to complete json file and convert it to yaml
-sed -r '$s/(.*),/\1 /' plugins.json > trimmed.json
-echo ']}' >> trimmed.json
-cat trimmed.json | yq -P > new_plugins.yaml
+cat plugins.json | yq -P >> new_plugins.yaml
 
 echo "Cleaning YAML..."
 #remove version fields and correct spacing
 sed -i '' '/version/d' new_plugins.yaml
 sed -i '' 's/name/id/g' new_plugins.yaml
 sed -i '' 's/  id/- id/g' new_plugins.yaml
-
-echo "Cleaning up temp files..."
-rm plugins.json
-rm trimmed.json
+sed -i '' '/Plugins/d' new_plugins.yaml
 
 echo "New Plugins.yaml"
 cat new_plugins.yaml
