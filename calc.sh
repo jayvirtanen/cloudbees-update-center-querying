@@ -11,7 +11,7 @@ EOF
 CI_VERSION=2.263.4.2
 PLUGIN_YAML_PATH="plugins.yaml"
 
-while getopts hv:f opt; do
+while getopts hv:xf: opt; do
     case $opt in
         h)
             show_help
@@ -28,6 +28,8 @@ while getopts hv:f opt; do
     esac
 done
 
+echo $PLUGIN_YAML_PATH
+
 CB_UPDATE_CENTER=${CB_UPDATE_CENTER:="https://jenkins-updates.cloudbees.com/update-center/envelope-core-mm"}
 UC_URL="$CB_UPDATE_CENTER/update-center.json?version=$CI_VERSION"
 
@@ -36,7 +38,7 @@ echo $UC_URL
 
 wget -q -O - $UC_URL | sed '1d' | sed '$d' > uc.json
 
-LENGTH=$(cat plugins.yaml | yq '.plugins.[]' | wc -l)
+LENGTH=$(cat $PLUGIN_YAML_PATH | yq '.plugins.[]' | wc -l)
 
 #Decrements plugin list length to loop through and build into array
 $((LENGTH--)) >/dev/null 2>&1
