@@ -59,11 +59,15 @@ do
   | dsq -s json 'select name, version from {}')
   PLUG_ARRAY+=($PLUG)
   CLEAN=$(echo $PLUG |sed 's/[][]//g')
-  echo $CLEAN"," >> plugins.txt
+  if ((${#CLEAN}!=0));
+  then
+    echo $CLEAN"," >> plugins.txt
+  fi
 done
 
 sed -r '$s/(.*),/\1 /' plugins.txt > temp.txt
 cat temp.txt >> plugins.json
+rm plugins.txt
 
 echo '],"Dependency Plugins":[' >> plugins.json
 echo "Checking Update Center for versions of plugin dependencies..."
@@ -93,27 +97,38 @@ echo "Printing results to plugins.json"
 for i in "${UNIQUE_DEPS[@]}"
 do
     CLEAN=$(echo $i |sed 's/[][]//g')
+    if ((${#CLEAN}!=0));
+    then
     echo $CLEAN"," >> plugins.txt
+    fi
 done
 sed -r '$s/(.*),/\1 /' plugins.txt > temp.txt
 cat temp.txt >> plugins.json
+rm plugins.txt
 
 echo '],"Total Plugins":[' >> plugins.json
+echo '{"plugins":[' > yaml.json
 
 #Combines all JSON objects from array into single object
 for i in "${UNIQUE_PLUGS[@]}"
 do
     CLEAN=$(echo $i |sed 's/[][]//g')
+    if ((${#CLEAN}!=0));
+    then
     echo $CLEAN"," >> plugins.txt
+    echo $CLEAN"," >> yaml.json
+    fi
 done
+
 sed -r '$s/(.*),/\1 /' plugins.txt > temp.txt
+sed -r '$s/(.*),/\1 /' yaml.json > temp.json
 cat temp.txt >> plugins.json
+echo "]}" >> temp.json
 echo "]}" >> plugins.json
 
 echo "Building new_plugins.yaml..."
-echo "plugins:" > new_plugins.yaml
 #trims hanging comma and adds close bracket to complete json file and convert it to yaml
-cat plugins.json | yq -P >> new_plugins.yaml
+cat temp.json | yq -P > new_plugins.yaml
 
 echo "Cleaning YAML..."
 #remove version fields and correct spacing
@@ -121,6 +136,13 @@ sed -i '' '/version/d' new_plugins.yaml
 sed -i '' 's/name/id/g' new_plugins.yaml
 sed -i '' 's/  id/- id/g' new_plugins.yaml
 sed -i '' '/Plugins/d' new_plugins.yaml
+
+echo "Cleaning up"
+rm temp.json
+rm temp.txt
+rm uc.json
+rm yaml.json
+rm plugins.txt
 
 echo "New Plugins.yaml"
 cat new_plugins.yaml
