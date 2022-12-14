@@ -122,12 +122,12 @@ done
 
 sed -r '$s/(.*),/\1 /' plugins.txt > temp.txt
 sed -r '$s/(.*),/\1 /' yaml.json > temp.json
+
 cat temp.txt >> plugins.json
 echo "]}" >> temp.json
 echo "]}" >> plugins.json
 
 echo "Building new_plugins.yaml..."
-#trims hanging comma and adds close bracket to complete json file and convert it to yaml
 cat temp.json | yq -P > new_plugins.yaml
 
 echo "Cleaning YAML..."
@@ -140,7 +140,6 @@ sed -i '' '/Plugins/d' new_plugins.yaml
 echo "Cleaning up"
 rm temp.json
 rm temp.txt
-rm uc.json
 rm yaml.json
 rm plugins.txt
 
