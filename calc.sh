@@ -8,7 +8,7 @@ Usage: ${0##*/} -v <CI_VERSION> [-f <path/to/plugins.yaml>]
 EOF
 }
 
-CI_VERSION=2.263.4.2
+CI_VERSION=2.387.3.5
 PLUGIN_YAML_PATH="plugins.yaml"
 
 while getopts hv:xf: opt; do
@@ -30,7 +30,7 @@ done
 
 echo $PLUGIN_YAML_PATH
 
-CB_UPDATE_CENTER=${CB_UPDATE_CENTER:="https://jenkins-updates.cloudbees.com/update-center/envelope-core-mm"}
+CB_UPDATE_CENTER=${CB_UPDATE_CENTER:="https://jenkins-updates.cloudbees.com/update-center/envelope-core-cm"}
 UC_URL="$CB_UPDATE_CENTER/update-center.json?version=$CI_VERSION"
 
 echo "fetching update center:"
@@ -45,12 +45,19 @@ $((LENGTH--)) >/dev/null 2>&1
 for i in `seq 0 1 $LENGTH`
 do    
   PLUGIN=$(yq e ".plugins.[$i]" $PLUGIN_YAML_PATH)
-  arrPLUGIN=(${PLUGIN//:/ })
-  PLUGIN_ARRAY[i]=${arrPLUGIN[1]}
+  echo $PLUGIN
+  #arrPLUGIN=(${PLUGIN//:/ })
+  #echo ${arrPLUGIN[1]}
+  PLUGIN_ARRAY[i]=${PLUGIN}
 done
 echo "" > plugins.txt
 echo '{"Listed Plugins":[' > plugins.json
 echo "Checking Update Center for versions of listed plugins..."
+
+for i in "${PLUGIN_ARRAY[@]}"
+do
+  echo $i
+done
 
 #Pulls the versions of the plugins listed in the plugins.yaml from the JSON provided by the UC
 for i in "${PLUGIN_ARRAY[@]}"
